@@ -1,4 +1,4 @@
-package com.vmestupinan.auth.model;
+package com.vmestupinan.auth.util;
 
 public enum Role {
     USER,
