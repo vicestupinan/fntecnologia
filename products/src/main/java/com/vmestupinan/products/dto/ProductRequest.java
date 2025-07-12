@@ -1,5 +1,6 @@
 package com.vmestupinan.products.dto;
 
+import com.vmestupinan.products.model.Category;
 import com.vmestupinan.products.model.Status;
 
 import jakarta.validation.constraints.NotBlank;
@@ -25,8 +26,8 @@ public class ProductRequest {
     @Positive(message = "Price must be greater than zero")
     private Double price;
 
-    @NotBlank(message = "Category is required")
-    private String category;
+    @NotNull(message = "Category is required")
+    private Category category;
 
     @NotNull(message = "Status is required")
     private Status status;

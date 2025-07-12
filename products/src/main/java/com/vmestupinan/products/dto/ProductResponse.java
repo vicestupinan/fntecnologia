@@ -1,5 +1,6 @@
 package com.vmestupinan.products.dto;
 
+import com.vmestupinan.products.model.Category;
 import com.vmestupinan.products.model.Status;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +17,6 @@ public class ProductResponse {
     private String name;
     private String description;
     private Double price;
-    private String category;
+    private Category category;
     private Status status;
 }
