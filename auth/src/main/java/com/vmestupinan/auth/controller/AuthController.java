@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vmestupinan.auth.dto.AuthRequest;
 import com.vmestupinan.auth.dto.AuthResponse;
 import com.vmestupinan.auth.dto.RegisterRequest;
-import com.vmestupinan.auth.security.AuthService;
+import com.vmestupinan.auth.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,12 +22,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }

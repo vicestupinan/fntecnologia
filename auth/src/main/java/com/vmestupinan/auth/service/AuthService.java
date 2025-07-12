@@ -1,4 +1,4 @@
-package com.vmestupinan.auth.security;
+package com.vmestupinan.auth.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import com.vmestupinan.auth.dto.AuthRequest;
 import com.vmestupinan.auth.dto.AuthResponse;
 import com.vmestupinan.auth.dto.RegisterRequest;
+import com.vmestupinan.auth.exception.EmailAlreadyExistsException;
+import com.vmestupinan.auth.model.Role;
 import com.vmestupinan.auth.model.User;
 import com.vmestupinan.auth.repository.UserRepository;
-import com.vmestupinan.auth.service.JwtService;
-import com.vmestupinan.auth.util.Role;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +27,9 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
 
     public AuthResponse register(RegisterRequest registerRequest) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email is already in use");
+        }
 
         User user = User.builder()
                 .name(registerRequest.getName())
@@ -43,13 +46,12 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthRequest request) {
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        request.getEmail(),
                         request.getPassword()));
 
-        UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
+        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
         String jwt = jwtService.generateToken(user);
 
         return new AuthResponse(jwt);
