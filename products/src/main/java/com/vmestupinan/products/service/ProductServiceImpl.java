@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.vmestupinan.products.dto.ProductRequest;
 import com.vmestupinan.products.dto.ProductResponse;
+import com.vmestupinan.products.exception.ProductAlreadyExistsException;
 import com.vmestupinan.products.model.Product;
 import com.vmestupinan.products.repository.ProductRepository;
 
@@ -20,6 +21,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
+        if (productRepository.existsByNameIgnoreCase(request.getName())) {
+            throw new ProductAlreadyExistsException("Product already exists with name: " + request.getName());
+        }
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())

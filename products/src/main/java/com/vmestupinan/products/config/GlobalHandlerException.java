@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.vmestupinan.products.exception.ProductAlreadyExistsException;
 import com.vmestupinan.products.model.ApiError;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -28,6 +29,19 @@ public class GlobalHandlerException {
                 .body(ApiError.builder()
                         .message(ex.getMessage())
                         .status(HttpStatus.NOT_FOUND.value())
+                        .path(request.getRequestURI())
+                        .build());
+    }
+
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleEntityNotFound(
+            ProductAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiError.builder()
+                        .message(ex.getMessage())
+                        .status(HttpStatus.CONFLICT.value())
                         .path(request.getRequestURI())
                         .build());
     }
