@@ -47,3 +47,5 @@ build/
 # Spring Boot sensitive config
 auth/src/main/resources/application.properties
 gateway/src/main/resources/application.yml
+auth/src/main/resources/application.yml
+products/src/main/resources/application.yml
