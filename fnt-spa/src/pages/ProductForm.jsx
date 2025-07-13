@@ -20,6 +20,7 @@ export default function ProductForm() {
   const [product, setProduct] = useState(emptyProduct);
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState("");
+  const [formErrors, setFormErrors] = useState({});
 
   const isEdit = Boolean(id);
 
@@ -55,7 +56,8 @@ export default function ProductForm() {
       }
       navigate("/products");
     } catch (err) {
-      setError(err.message || "Failed to save product");
+      setFormErrors(err.fieldErrors);
+      setError("Failed to save product");
     }
   };
 
@@ -65,10 +67,10 @@ export default function ProductForm() {
     <Box>
       <Heading mb={6}>{isEdit ? "Edit Product" : "Create Product"}</Heading>
       <form onSubmit={handleSubmit}>
-        <ProductFormFields product={product} onChange={handleChange} />
+        <ProductFormFields product={product} onChange={handleChange} errors={formErrors}/>
         <Flex justify="space-between" mt={6}>
           <Button onClick={() => navigate("/products")}>Back</Button>
-          <Button type="submit" colorScheme="teal">
+          <Button type="submit" colorScheme="teal" mb={6}>
             {isEdit ? "Update" : "Create"}
           </Button>
         </Flex>

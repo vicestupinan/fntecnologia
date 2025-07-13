@@ -21,9 +21,9 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route path="products" element={<ProductList />} />
-        <Route path="products/new" element={<ProductForm />} />
-        <Route path="products/:id/edit" element={<ProductForm />} />
+        <Route path="/products" element={<ProductList />} />
+        <Route path="/products/new" element={<ProductForm />} />
+        <Route path="/products/:id/edit" element={<ProductForm />} />
       </Route>
     </Routes>
   );

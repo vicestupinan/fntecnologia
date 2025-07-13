@@ -31,9 +31,11 @@ export const createProduct = async (product, token) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Failed to create product"
-    );
+    const errors = error.response?.data?.errors;
+    if (errors) {
+      throw { fieldErrors: errors };
+    }
+    throw new Error("Failed to create product");
   }
 };
 
@@ -44,9 +46,11 @@ export const updateProduct = async (id, product, token) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Failed to update product"
-    );
+    const errors = error.response?.data?.errors;
+    if (errors) {
+      throw { fieldErrors: errors };
+    }
+    throw new Error("Failed to update product");
   }
 };
 
