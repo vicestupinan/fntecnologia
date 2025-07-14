@@ -44,7 +44,7 @@ java -jar target/auth-service-1.0.0.jar
 ```bash
 cd product-service
 mvn clean package
-java -jar target/product-1.0.0.jar
+java -jar target/product-service-1.0.0.jar
 ```
 
 ### Gateway Service
