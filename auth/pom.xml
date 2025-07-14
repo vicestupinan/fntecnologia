@@ -10,8 +10,8 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vmestupinan</groupId>
-	<artifactId>auth</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>auth-service</artifactId>
+	<version>1.0.0</version>
 	<name>auth</name>
 	<description>FNTecnologia microservicio auth</description>
 	<url />

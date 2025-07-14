@@ -37,21 +37,21 @@ PostgreSQL para product-service en el puerto 5433
 ```bash
 cd auth-service
 mvn clean package
-java -jar target/auth-service.jar
+java -jar target/auth-service-1.0.0.jar
 ```
 
 ### Auth Service
 ```bash
 cd product-service
 mvn clean package
-java -jar target/product-service.jar
+java -jar target/product-1.0.0.jar
 ```
 
 ### Gateway Service
 ```bash
 cd gateway-service
 mvn clean package
-java -jar target/gateway-service.jar
+java -jar target/gateway-1.0.0.jar
 ```
 
 ### Ejecutar el frontend
