@@ -17,80 +17,92 @@ import com.vmestupinan.auth.exception.EmailAlreadyExistsException;
 import com.vmestupinan.auth.model.ApiError;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalHandlerException {
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ApiError> handleUsernameNotFound(
-            UsernameNotFoundException ex,
-            HttpServletRequest request) {
+        @ExceptionHandler(UsernameNotFoundException.class)
+        public ResponseEntity<ApiError> handleUsernameNotFound(
+                        UsernameNotFoundException ex,
+                        HttpServletRequest request) {
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiError.builder()
-                        .message(ex.getMessage())
-                        .status(HttpStatus.NOT_FOUND.value())
-                        .path(request.getRequestURI())
-                        .build());
-    }
+                log.warn("[UsernameNotFound] {} at {}", ex.getMessage(), request.getRequestURI());
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiError> handleBadCredentials(
-            BadCredentialsException ex,
-            HttpServletRequest request) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(ApiError.builder()
+                                                .message(ex.getMessage())
+                                                .status(HttpStatus.NOT_FOUND.value())
+                                                .path(request.getRequestURI())
+                                                .build());
+        }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiError.builder()
-                        .message("Invalid email or password")
-                        .status(HttpStatus.UNAUTHORIZED.value())
-                        .path(request.getRequestURI())
-                        .build());
-    }
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<ApiError> handleBadCredentials(
+                        BadCredentialsException ex,
+                        HttpServletRequest request) {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+                log.warn("[BadCredentials] Invalid login attempt at {}", request.getRequestURI());
 
-        Map<String, List<String>> errors = new HashMap<>();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(ApiError.builder()
+                                                .message("Invalid email or password")
+                                                .status(HttpStatus.UNAUTHORIZED.value())
+                                                .path(request.getRequestURI())
+                                                .build());
+        }
 
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.computeIfAbsent(error.getField(), key -> new ArrayList<>())
-                    .add(error.getDefaultMessage());
-        });
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ApiError> handleValidationException(
+                        MethodArgumentNotValidException ex,
+                        HttpServletRequest request) {
 
-        ApiError apiError = ApiError.builder()
-                .message("Validation failed")
-                .status(HttpStatus.BAD_REQUEST.value())
-                .path(request.getRequestURI())
-                .errors(errors)
-                .build();
+                Map<String, List<String>> errors = new HashMap<>();
 
-        return ResponseEntity.badRequest().body(apiError);
-    }
+                ex.getBindingResult().getFieldErrors().forEach(error -> {
+                        errors.computeIfAbsent(error.getField(), key -> new ArrayList<>())
+                                        .add(error.getDefaultMessage());
+                });
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ApiError> handleEmailAlreadyExists(
-            EmailAlreadyExistsException ex,
-            HttpServletRequest request) {
+                log.warn("[Validation failed] Invalid request at {} - {}", request.getRequestURI(), errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiError.builder()
-                        .message(ex.getMessage())
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .path(request.getRequestURI())
-                        .build());
-    }
+                ApiError apiError = ApiError.builder()
+                                .message("Validation failed")
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .path(request.getRequestURI())
+                                .errors(errors)
+                                .build();
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGeneralException(
-            Exception ex,
-            HttpServletRequest request) {
+                return ResponseEntity.badRequest().body(apiError);
+        }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiError.builder()
-                        .message("An unexpected error occurred: " + ex.getMessage())
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .path(request.getRequestURI())
-                        .build());
-    }
+        @ExceptionHandler(EmailAlreadyExistsException.class)
+        public ResponseEntity<ApiError> handleEmailAlreadyExists(
+                        EmailAlreadyExistsException ex,
+                        HttpServletRequest request) {
+
+                log.warn("[EmailAlreadyExists] {} at {}", ex.getMessage(), request.getRequestURI());
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(ApiError.builder()
+                                                .message(ex.getMessage())
+                                                .status(HttpStatus.BAD_REQUEST.value())
+                                                .path(request.getRequestURI())
+                                                .build());
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ApiError> handleGeneralException(
+                        Exception ex,
+                        HttpServletRequest request) {
+
+                log.error("[Unhandled exception] {} at {}", ex.getMessage(), request.getRequestURI(), ex);
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(ApiError.builder()
+                                                .message("An unexpected error occurred: " + ex.getMessage())
+                                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                                .path(request.getRequestURI())
+                                                .build());
+        }
 }

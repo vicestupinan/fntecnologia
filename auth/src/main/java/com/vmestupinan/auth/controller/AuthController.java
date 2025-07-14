@@ -13,7 +13,9 @@ import com.vmestupinan.auth.service.AuthService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -23,11 +25,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+        log.info("POST /api/auth/register - Registering user with email: {}", request.getEmail());
+        AuthResponse response = authService.register(request);
+        log.info("User registered successfully: {}", request.getEmail());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        log.info("POST /api/auth/login - Login attempt for email: {}", request.getEmail());
+        AuthResponse response = authService.login(request);
+        log.info("Login successful for email: {}", request.getEmail());
+        return ResponseEntity.ok(response);
     }
 }

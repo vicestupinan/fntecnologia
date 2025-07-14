@@ -13,7 +13,9 @@ import com.vmestupinan.products.repository.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -21,7 +23,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
+        log.info("Creating product: {}", request.getName());
         if (productRepository.existsByNameIgnoreCase(request.getName())) {
+            log.warn("Product already exists with name: {}", request.getName());
             throw new ProductAlreadyExistsException("Product already exists with name: " + request.getName());
         }
         Product product = Product.builder()
@@ -33,28 +37,44 @@ public class ProductServiceImpl implements ProductService {
                 .build();
 
         Product saved = productRepository.save(product);
+        log.info("Product created with ID: {}", saved.getId());
         return toResponse(saved);
     }
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
+        log.info("Retrieving all products");
+        List<ProductResponse> products = productRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+
+        log.debug("Total products found: {}", products.size());
+        return products;
     }
 
     @Override
     public ProductResponse getProductById(Long id) {
+        log.info("Retrieving product with ID: {}", id);
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.error("Product not found with ID: {}", id);
+                    return new EntityNotFoundException("Product not found with id: " + id);
+                });
+
         return toResponse(product);
     }
 
     @Override
     public ProductResponse updateProduct(Long id, ProductRequest request) {
+        log.info("Updating product with ID: {}", id);
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.error("Product not found for update with ID: {}", id);
+                    return new EntityNotFoundException("Product not found with id: " + id);
+                });
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -62,15 +82,22 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(request.getCategory());
         product.setStatus(request.getStatus());
 
-        return toResponse(productRepository.save(product));
+        Product updated = productRepository.save(product);
+        log.info("Product updated with ID: {}", updated.getId());
+        return toResponse(updated);
     }
 
     @Override
     public void deleteProduct(Long id) {
+        log.info("Deleting product with ID: {}", id);
+
         if (!productRepository.existsById(id)) {
+            log.error("Product not found for deletion with ID: {}", id);
             throw new EntityNotFoundException("Product not found with id: " + id);
         }
+
         productRepository.deleteById(id);
+        log.info("Product deleted with ID: {}", id);
     }
 
     private ProductResponse toResponse(Product product) {

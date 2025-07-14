@@ -19,7 +19,9 @@ import com.vmestupinan.products.service.ProductService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -29,20 +31,25 @@ public class ProductController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+        log.info("POST /api/products - Attempt to create product: {}", request.getName());
         ProductResponse response = productService.createProduct(request);
+        log.info("Product created successfully with ID: {}", response.getId());
         return ResponseEntity.status(201).body(response);
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<List<ProductResponse>> getAll() {
+        log.info("GET /api/products - Fetching all products");
         List<ProductResponse> products = productService.getAllProducts();
+        log.debug("Total products returned: {}", products.size());
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
+        log.info("GET /api/products/{} - Fetching product", id);
         ProductResponse product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
@@ -50,14 +57,18 @@ public class ProductController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ProductResponse> update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        log.info("PUT /api/products/{} - Updating product: {}", id, request.getName());
         ProductResponse updated = productService.updateProduct(id, request);
+        log.info("Product updated successfully with ID: {}", updated.getId());
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("DELETE /api/products/{} - Deleting product", id);
         productService.deleteProduct(id);
+        log.info("Product deleted successfully with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 }
